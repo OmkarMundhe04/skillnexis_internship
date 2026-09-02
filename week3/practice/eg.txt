@@ -1,0 +1,4 @@
+Hello World
+This is Python
+File handling example
+this is file number 1 

@@ -1,0 +1,5 @@
+file=open("eg.txt","r")
+lines=file.readlines()
+total_lines=len(lines)
+print(f"Total no of lines in {file.name} is {total_lines}")
+file.close()
