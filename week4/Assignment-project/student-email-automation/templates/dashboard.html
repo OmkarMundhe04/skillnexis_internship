@@ -285,20 +285,29 @@
           </div>
         </div>
 
-        <!-- Upload Drag & Drop Zone -->
-        <div class="upload-zone" id="csv-drop-zone">
-          <input type="file" id="csv-file-input" accept=".csv" class="file-input-hidden">
-          <div class="upload-zone-content">
-            <div class="upload-icon">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
-            </div>
-            <h3 class="upload-title">Drag and drop your CSV file here, or <span class="upload-link">browse</span></h3>
-            <p class="upload-hint">Must contain <code>name</code> and <code>email</code> headers. UTF-8 & UTF-8-BOM supported.</p>
+        <!-- Direct Add Recipient Card -->
+        <div class="direct-add-card">
+          <div class="direct-add-header">
+            <h3 class="direct-add-title">Add Student Recipient Directly</h3>
+            <span class="direct-add-subtitle">Add individual recipients without touching or uploading a CSV file</span>
           </div>
+          <form id="form-direct-add-student" class="direct-add-form" onsubmit="return false;">
+            <div class="input-group">
+              <label for="input-new-student-name" class="visually-hidden">Student Name</label>
+              <input type="text" id="input-new-student-name" class="form-input" placeholder="Full Name (e.g., Jane Doe)" required autocomplete="off">
+            </div>
+            <div class="input-group">
+              <label for="input-new-student-email" class="visually-hidden">Email Address</label>
+              <input type="email" id="input-new-student-email" class="form-input" placeholder="Email (e.g., jane@example.com)" required autocomplete="off">
+            </div>
+            <button type="button" class="btn btn-primary btn-md" id="btn-add-direct-student">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Recipient
+            </button>
+          </form>
         </div>
 
         <!-- Filter & Search Bar -->
@@ -326,15 +335,42 @@
                 <th>Email Address</th>
                 <th>Status</th>
                 <th>Note / Validation</th>
+                <th style="text-align: right;">Action</th>
               </tr>
             </thead>
             <tbody id="recipients-table-body">
               <tr>
-                <td colspan="5" class="table-empty">Loading recipients from CSV...</td>
+                <td colspan="6" class="table-empty">Loading recipients...</td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- Optional Bulk CSV Upload Drop Zone (Collapsible) -->
+        <details class="csv-details-accordion">
+          <summary class="csv-details-summary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            Or batch import from CSV file (Click to expand)
+          </summary>
+          <div class="upload-zone" id="csv-drop-zone">
+            <input type="file" id="csv-file-input" accept=".csv" class="file-input-hidden">
+            <div class="upload-zone-content">
+              <div class="upload-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <h3 class="upload-title">Drag and drop your CSV file here, or <span class="upload-link">browse</span></h3>
+              <p class="upload-hint">Must contain <code>name</code> and <code>email</code> headers. Overwrites current list.</p>
+            </div>
+          </div>
+        </details>
       </div>
     </div>
 

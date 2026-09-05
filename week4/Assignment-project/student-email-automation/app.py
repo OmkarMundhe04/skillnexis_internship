@@ -81,6 +81,15 @@ class TemplateUpdateRequest(BaseModel):
     html: str
 
 
+class StudentAddRequest(BaseModel):
+    name: str
+    email: str
+
+
+class StudentRemoveRequest(BaseModel):
+    email: str
+
+
 class SettingsUpdateRequest(BaseModel):
     sender_email: Optional[str] = None
     sender_password: Optional[str] = None
@@ -161,6 +170,106 @@ async def get_students() -> Dict[str, Any]:
             "csv_filename": config.csv_path.name,
             "error": str(exc),
         }
+
+
+@app.post("/api/students/add")
+async def add_student(payload: StudentAddRequest) -> Dict[str, Any]:
+    """Directly add a new student recipient to the list."""
+    name = payload.name.strip()
+    email = payload.email.strip()
+
+    if not name:
+        raise HTTPException(status_code=400, detail="Student name cannot be empty.")
+    if not email:
+        raise HTTPException(status_code=400, detail="Student email cannot be empty.")
+    if not validate_email(email):
+        raise HTTPException(status_code=400, detail=f"Invalid email address format: '{email}'")
+
+    config = load_config()
+    csv_file = config.csv_path
+    csv_file.parent.mkdir(parents=True, exist_ok=True)
+
+    existing_records = []
+    if csv_file.exists() and csv_file.stat().st_size > 0:
+        with csv_file.open("r", newline="", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            if reader.fieldnames:
+                normalized = {col.strip().lower(): col for col in reader.fieldnames if col}
+                name_col = normalized.get("name", "name")
+                email_col = normalized.get("email", "email")
+                for row in reader:
+                    r_name = (row.get(name_col) or "").strip()
+                    r_email = (row.get(email_col) or "").strip()
+                    if r_email.lower() == email.lower():
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Student with email '{email}' already exists ({r_name}).",
+                        )
+                    if r_name and r_email:
+                        existing_records.append({"name": r_name, "email": r_email})
+
+    existing_records.append({"name": name, "email": email})
+
+    with csv_file.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["name", "email"])
+        for record in existing_records:
+            writer.writerow([record["name"], record["email"]])
+
+    return {
+        "success": True,
+        "message": f"Successfully added {name} <{email}>.",
+        "student": {"name": name, "email": email},
+        "total_count": len(existing_records),
+    }
+
+
+@app.post("/api/students/remove")
+async def remove_student(payload: StudentRemoveRequest) -> Dict[str, Any]:
+    """Remove a student recipient by email."""
+    target_email = payload.email.strip().lower()
+    if not target_email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+
+    config = load_config()
+    csv_file = config.csv_path
+    if not csv_file.exists():
+        raise HTTPException(status_code=404, detail="Student list is empty.")
+
+    remaining_records = []
+    removed_name = None
+
+    with csv_file.open("r", newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        if not reader.fieldnames:
+            raise HTTPException(status_code=400, detail="CSV file is empty.")
+        normalized = {col.strip().lower(): col for col in reader.fieldnames if col}
+        name_col = normalized.get("name", "name")
+        email_col = normalized.get("email", "email")
+        for row in reader:
+            r_name = (row.get(name_col) or "").strip()
+            r_email = (row.get(email_col) or "").strip()
+            if r_email.lower() == target_email:
+                removed_name = r_name
+                continue
+            if r_name or r_email:
+                remaining_records.append({"name": r_name, "email": r_email})
+
+    if removed_name is None:
+        raise HTTPException(status_code=404, detail=f"No student found with email '{payload.email}'.")
+
+    with csv_file.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["name", "email"])
+        for record in remaining_records:
+            writer.writerow([record["name"], record["email"]])
+
+    return {
+        "success": True,
+        "message": f"Successfully removed {removed_name} <{payload.email}>.",
+        "removed_email": payload.email,
+        "total_count": len(remaining_records),
+    }
 
 
 @app.post("/api/upload-csv")

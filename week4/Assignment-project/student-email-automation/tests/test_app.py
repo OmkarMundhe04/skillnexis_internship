@@ -57,6 +57,48 @@ def test_api_template(client):
     assert "Alex Morgan" in data["sample_preview"]
 
 
+def test_api_add_and_remove_student(client):
+    """Verify directly adding and removing a student via API."""
+    unique_email = "direct_test_student_unique@example.com"
+    # 1. Add student
+    add_resp = client.post(
+        "/api/students/add",
+        json={"name": "Direct Test Student", "email": unique_email},
+    )
+    assert add_resp.status_code == 200
+    assert add_resp.json()["success"] is True
+
+    # 2. Duplicate rejection
+    dup_resp = client.post(
+        "/api/students/add",
+        json={"name": "Duplicate", "email": unique_email},
+    )
+    assert dup_resp.status_code == 400
+    assert "already exists" in dup_resp.json()["detail"]
+
+    # 3. Invalid email rejection
+    inv_resp = client.post(
+        "/api/students/add",
+        json={"name": "Bad Email", "email": "not-an-email"},
+    )
+    assert inv_resp.status_code == 400
+
+    # 4. Remove student
+    rem_resp = client.post(
+        "/api/students/remove",
+        json={"email": unique_email},
+    )
+    assert rem_resp.status_code == 200
+    assert rem_resp.json()["success"] is True
+
+    # 5. Remove non-existent returns 404
+    rem_404 = client.post(
+        "/api/students/remove",
+        json={"email": unique_email},
+    )
+    assert rem_404.status_code == 404
+
+
 def test_api_template_update_empty(client):
     """Verify POST /api/template rejects empty templates."""
     response = client.post("/api/template", json={"html": "   "})

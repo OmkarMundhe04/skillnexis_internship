@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnClearTerminal = document.getElementById('btn-clear-terminal');
 
   // Recipients
+  const inputNewStudentName = document.getElementById('input-new-student-name');
+  const inputNewStudentEmail = document.getElementById('input-new-student-email');
+  const btnAddDirectStudent = document.getElementById('btn-add-direct-student');
   const csvDropZone = document.getElementById('csv-drop-zone');
   const csvFileInput = document.getElementById('csv-file-input');
   const filterRecipients = document.getElementById('filter-recipients');
@@ -362,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
       renderRecipientsTable();
     } catch (err) {
       console.error(err);
-      recipientsTableBody.innerHTML = `<tr><td colspan="5" class="table-empty">Error loading CSV recipients: ${err.message}</td></tr>`;
+      recipientsTableBody.innerHTML = `<tr><td colspan="6" class="table-empty">Error loading recipients: ${err.message}</td></tr>`;
     }
   }
 
@@ -383,6 +386,15 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><code>${escapeHtml(st.email)}</code></td>
           <td><span class="badge badge-emerald">VALID</span></td>
           <td>Ready for delivery</td>
+          <td style="text-align: right;">
+            <button type="button" class="btn btn-danger btn-remove-student" data-email="${escapeHtml(st.email)}" data-name="${escapeHtml(st.name)}" title="Remove student from list">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Remove
+            </button>
+          </td>
         </tr>
       `;
     });
@@ -392,6 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (filter && !sk.name.toLowerCase().includes(filter) && !sk.email.toLowerCase().includes(filter)) {
         return;
       }
+      const canRemove = Boolean(sk.email);
       rowsHtml += `
         <tr>
           <td>${displayIndex++}</td>
@@ -399,16 +412,105 @@ document.addEventListener('DOMContentLoaded', () => {
           <td><code>${escapeHtml(sk.email || '—')}</code></td>
           <td><span class="badge badge-amber">SKIPPED</span></td>
           <td class="term-line failed">${escapeHtml(sk.reason || 'Invalid format')}</td>
+          <td style="text-align: right;">
+            ${canRemove ? `
+              <button type="button" class="btn btn-danger btn-remove-student" data-email="${escapeHtml(sk.email)}" data-name="${escapeHtml(sk.name || sk.email)}" title="Remove invalid record">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                Remove
+              </button>
+            ` : '—'}
+          </td>
         </tr>
       `;
     });
 
     if (!rowsHtml) {
-      rowsHtml = `<tr><td colspan="5" class="table-empty">No student records match your query.</td></tr>`;
+      rowsHtml = `<tr><td colspan="6" class="table-empty">No student records match your query.</td></tr>`;
     }
 
     recipientsTableBody.innerHTML = rowsHtml;
   }
+
+  // Handle Direct Add Student
+  async function handleDirectAddStudent() {
+    const name = (inputNewStudentName.value || '').trim();
+    const email = (inputNewStudentEmail.value || '').trim();
+
+    if (!name) {
+      showToast('Please enter student name.', 'error');
+      inputNewStudentName.focus();
+      return;
+    }
+    if (!email) {
+      showToast('Please enter student email.', 'error');
+      inputNewStudentEmail.focus();
+      return;
+    }
+
+    btnAddDirectStudent.disabled = true;
+    try {
+      const res = await fetch('/api/students/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Failed to add student');
+
+      showToast(data.message, 'success');
+      inputNewStudentName.value = '';
+      inputNewStudentEmail.value = '';
+      loadStudents();
+      fetchStatus();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btnAddDirectStudent.disabled = false;
+    }
+  }
+
+  btnAddDirectStudent.addEventListener('click', handleDirectAddStudent);
+  [inputNewStudentName, inputNewStudentEmail].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleDirectAddStudent();
+      }
+    });
+  });
+
+  // Handle Remove Student via Delegated Click
+  recipientsTableBody.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.btn-remove-student');
+    if (!btn) return;
+    const email = btn.getAttribute('data-email');
+    const name = btn.getAttribute('data-name') || email;
+
+    if (!confirm(`Are you sure you want to remove ${name} (${email}) from recipients?`)) {
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      const res = await fetch('/api/students/remove', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || 'Failed to remove student');
+
+      showToast(data.message, 'success');
+      loadStudents();
+      fetchStatus();
+    } catch (err) {
+      showToast(err.message, 'error');
+      btn.disabled = false;
+    }
+  });
 
   filterRecipients.addEventListener('input', renderRecipientsTable);
   btnRefreshStudents.addEventListener('click', () => {

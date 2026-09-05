@@ -1035,3 +1035,116 @@ body {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+/* Direct Recipient Management Styles */
+.direct-add-card {
+  background: var(--bg-card-elevated);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.direct-add-header {
+  margin-bottom: 1rem;
+}
+
+.direct-add-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.direct-add-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: block;
+  margin-top: 0.2rem;
+}
+
+.direct-add-form {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.direct-add-form .input-group {
+  flex: 1;
+  min-width: 220px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+  outline: none;
+  transition: var(--transition);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--primary-glow);
+}
+
+.form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Collapsible CSV Details Accordion */
+.csv-details-accordion {
+  margin-top: 1.5rem;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.csv-details-summary {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  user-select: none;
+  transition: var(--transition);
+}
+
+.csv-details-summary:hover {
+  color: var(--text-primary);
+}
+
+.csv-details-accordion[open] .upload-zone {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Action button in table */
+.btn-remove-student {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-sm);
+}
