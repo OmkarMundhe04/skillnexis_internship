@@ -155,20 +155,21 @@ def load_config(cli_args: Optional[Sequence[str]] = None) -> Config:
     if not log_path.is_absolute():
         log_path = BASE_DIR / log_path
 
-    # Apply CLI argument overrides
-    parsed = parse_arguments(cli_args)
+    # Apply CLI argument overrides if provided
+    if cli_args:
+        parsed = parse_arguments(cli_args)
 
-    if parsed.dry_run is True:
-        dry_run = True
-    elif parsed.live is True:
-        dry_run = False
+        if parsed.dry_run is True:
+            dry_run = True
+        elif parsed.live is True:
+            dry_run = False
 
-    if parsed.csv is not None:
-        csv_path = parsed.csv.resolve()
-    if parsed.template is not None:
-        template_path = parsed.template.resolve()
-    if parsed.delay is not None:
-        delay_seconds = max(0.0, parsed.delay)
+        if parsed.csv is not None:
+            csv_path = parsed.csv.resolve()
+        if parsed.template is not None:
+            template_path = parsed.template.resolve()
+        if parsed.delay is not None:
+            delay_seconds = max(0.0, parsed.delay)
 
     return Config(
         sender_email=sender_email,
@@ -411,6 +412,8 @@ def send_all(
 
 def main(cli_args: Optional[Sequence[str]] = None) -> int:
     """Application entrypoint."""
+    if cli_args is None:
+        cli_args = sys.argv[1:]
     try:
         config = load_config(cli_args)
     except Exception as err:

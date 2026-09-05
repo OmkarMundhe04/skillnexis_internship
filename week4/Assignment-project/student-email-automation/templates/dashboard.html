@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Email Automation — Cloud Dashboard</title>
+  <meta name="description" content="Production-ready web dashboard for personalized student email campaigns with real-time SSE dispatch progress, CSV data management, and template studio.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Top Navigation / Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-area">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 17a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9.5C2 7 4 5 6.5 5H18c2.2 0 4 1.8 4 4v8Z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">MailPulse</h1>
+          <span class="brand-subtitle">Student Email Automation</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <div class="status-pill" id="header-smtp-status">
+          <span class="status-dot pulsing" id="smtp-dot"></span>
+          <span id="smtp-status-text">Checking SMTP...</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-quick-test-smtp" title="Verify SMTP Connection">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Test SMTP
+        </button>
+        <a href="#tab-deploy" class="btn btn-primary btn-sm nav-link" data-tab="tab-deploy" id="btn-cloud-host-badge">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+          </svg>
+          Cloud Hosting
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Metric / Overview Cards -->
+  <main class="app-main">
+    <section class="metrics-grid" aria-label="Quick statistics">
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">Valid Recipients</span>
+          <span class="metric-icon icon-emerald">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </span>
+        </div>
+        <div class="metric-value" id="metric-valid-count">0</div>
+        <div class="metric-footnote" id="metric-csv-file">Source: students.csv</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">Invalid / Skipped</span>
+          <span class="metric-icon icon-amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </span>
+        </div>
+        <div class="metric-value" id="metric-skipped-count">0</div>
+        <div class="metric-footnote">Filtered for data safety</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">Sender Account</span>
+          <span class="metric-icon icon-indigo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+          </span>
+        </div>
+        <div class="metric-value truncate-email" id="metric-sender-email">Loading...</div>
+        <div class="metric-footnote" id="metric-smtp-host">smtp.gmail.com:587</div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-header">
+          <span class="metric-label">Default Safety Mode</span>
+          <span class="metric-icon icon-cyan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </span>
+        </div>
+        <div class="metric-value" id="metric-safety-mode">DRY RUN</div>
+        <div class="metric-footnote">Prevents accidental sends</div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="tab-dispatcher" id="tab-btn-dispatcher">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+        Campaign Dispatcher
+      </button>
+
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-recipients" id="tab-btn-recipients">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        Recipients (CSV)
+      </button>
+
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-template" id="tab-btn-template">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/>
+          <polyline points="8 6 2 12 8 18"/>
+        </svg>
+        Template Studio
+      </button>
+
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-logs" id="tab-btn-logs">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Audit Logs
+      </button>
+
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="tab-deploy" id="tab-btn-deploy">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+        </svg>
+        Cloud Hosting Setup
+      </button>
+    </nav>
+
+    <!-- Tab 1: Campaign Dispatcher -->
+    <div class="tab-content active" id="tab-dispatcher" role="tabpanel">
+      <div class="grid-2col">
+        <!-- Campaign Setup Card -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">Launch Campaign</h2>
+            <span class="badge badge-info">Real-time SSE Engine</span>
+          </div>
+
+          <form id="form-launch-campaign" onsubmit="return false;">
+            <div class="form-group">
+              <label class="form-label" for="select-mode">Execution Mode</label>
+              <div class="mode-select-grid">
+                <label class="mode-card selected" id="mode-card-dry">
+                  <input type="radio" name="dispatch-mode" value="dry_run" id="radio-mode-dry" checked>
+                  <div class="mode-card-content">
+                    <span class="mode-title">Dry Run (Safe Simulation)</span>
+                    <span class="mode-desc">Previews dispatches without connecting to SMTP. Zero risk.</span>
+                  </div>
+                  <span class="mode-badge badge-amber">SAFE</span>
+                </label>
+
+                <label class="mode-card" id="mode-card-live">
+                  <input type="radio" name="dispatch-mode" value="live" id="radio-mode-live">
+                  <div class="mode-card-content">
+                    <span class="mode-title">Live Send (Real Delivery)</span>
+                    <span class="mode-desc">Sends personalized emails to students via SMTP TLS.</span>
+                  </div>
+                  <span class="mode-badge badge-emerald">LIVE</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-with-value">
+                <label class="form-label" for="slider-delay">Rate-Limiting Delay Between Emails</label>
+                <span class="slider-display" id="slider-delay-val">1.0s</span>
+              </div>
+              <input type="range" class="form-range" id="slider-delay" min="0" max="5" step="0.5" value="1.0">
+              <span class="form-hint">Prevents anti-spam throttling and provider rate limits.</span>
+            </div>
+
+            <div class="campaign-summary-box">
+              <div class="summary-row">
+                <span>Total Recipients:</span>
+                <strong id="summary-recipients-count">0 Students</strong>
+              </div>
+              <div class="summary-row">
+                <span>Estimated Duration:</span>
+                <strong id="summary-duration">0 seconds</strong>
+              </div>
+              <div class="summary-row">
+                <span>Active Sender:</span>
+                <strong id="summary-sender" class="truncate-email">Configured in .env</strong>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-primary btn-block btn-lg" id="btn-start-campaign">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Start Email Campaign
+            </button>
+          </form>
+        </div>
+
+        <!-- Live Stream & Terminal Card -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">Live Progress & Stream</h2>
+            <div class="stream-status" id="stream-status-indicator">
+              <span class="status-dot"></span>
+              <span id="stream-status-text">Idle</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-section">
+            <div class="progress-info">
+              <span id="progress-text">Ready to dispatch</span>
+              <span id="progress-percentage">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Live Terminal Window -->
+          <div class="terminal-window" id="campaign-terminal">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="term-dot dot-red"></span>
+                <span class="term-dot dot-yellow"></span>
+                <span class="term-dot dot-green"></span>
+              </div>
+              <span class="terminal-title">live-dispatch-output.log</span>
+              <button class="btn btn-ghost btn-xs" id="btn-clear-terminal">Clear</button>
+            </div>
+            <div class="terminal-body" id="terminal-output">
+              <div class="term-line info">[SYSTEM] Web dashboard initialized. Ready to begin dispatch.</div>
+              <div class="term-line prompt">Select mode on the left and click "Start Email Campaign".</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Recipients (CSV) -->
+    <div class="tab-content" id="tab-recipients" role="tabpanel">
+      <div class="glass-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Recipient Management</h2>
+            <span class="card-subtitle">Manage, validate, and upload your recipient dataset.</span>
+          </div>
+          <div class="header-tools">
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-students">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload Drag & Drop Zone -->
+        <div class="upload-zone" id="csv-drop-zone">
+          <input type="file" id="csv-file-input" accept=".csv" class="file-input-hidden">
+          <div class="upload-zone-content">
+            <div class="upload-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <h3 class="upload-title">Drag and drop your CSV file here, or <span class="upload-link">browse</span></h3>
+            <p class="upload-hint">Must contain <code>name</code> and <code>email</code> headers. UTF-8 & UTF-8-BOM supported.</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="filter-recipients" placeholder="Filter by name or email...">
+          </div>
+          <div class="table-counts">
+            <span class="badge badge-emerald" id="badge-valid-count">0 Valid</span>
+            <span class="badge badge-amber" id="badge-skipped-count">0 Skipped</span>
+          </div>
+        </div>
+
+        <!-- Recipients Table -->
+        <div class="table-container">
+          <table class="data-table" id="recipients-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Student Name</th>
+                <th>Email Address</th>
+                <th>Status</th>
+                <th>Note / Validation</th>
+              </tr>
+            </thead>
+            <tbody id="recipients-table-body">
+              <tr>
+                <td colspan="5" class="table-empty">Loading recipients from CSV...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Template Studio -->
+    <div class="tab-content" id="tab-template" role="tabpanel">
+      <div class="grid-2col">
+        <!-- Editor Card -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">HTML Template Source</h2>
+              <span class="card-subtitle">Use <code>{{name}}</code> for dynamic student personalization.</span>
+            </div>
+            <button class="btn btn-primary btn-sm" id="btn-save-template">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                <polyline points="17 21 17 13 7 13 7 21"/>
+                <polyline points="7 3 7 8 15 8"/>
+              </svg>
+              Save Template
+            </button>
+          </div>
+
+          <div class="editor-container">
+            <textarea id="template-editor" class="code-editor" spellcheck="false" placeholder="Loading HTML template..."></textarea>
+          </div>
+        </div>
+
+        <!-- Live Visual Preview -->
+        <div class="glass-card">
+          <div class="card-header">
+            <h2 class="card-title">Live Email Preview</h2>
+            <span class="badge badge-info">Previewing as Alex Morgan</span>
+          </div>
+          <div class="preview-frame-wrapper">
+            <iframe id="template-preview-frame" class="email-preview-frame" title="Email Live Preview"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Audit Logs -->
+    <div class="tab-content" id="tab-logs" role="tabpanel">
+      <div class="glass-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Audit Trail & Delivery Logs</h2>
+            <span class="card-subtitle">Every delivery attempt, dry-run simulation, and skip reason is permanently recorded.</span>
+          </div>
+          <div class="header-tools">
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-logs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+            <button class="btn btn-danger btn-sm" id="btn-clear-logs">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+              Clear Logs
+            </button>
+          </div>
+        </div>
+
+        <div class="table-toolbar">
+          <div class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="filter-logs" placeholder="Filter logs by name, email, or status...">
+          </div>
+          <div class="filter-pills" id="log-status-filters">
+            <button class="pill active" data-status="ALL">All</button>
+            <button class="pill" data-status="SENT">Sent</button>
+            <button class="pill" data-status="DRY_RUN">Dry Run</button>
+            <button class="pill" data-status="FAILED">Failed</button>
+            <button class="pill" data-status="SKIPPED">Skipped</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table" id="logs-table">
+            <thead>
+              <tr>
+                <th>Recipient</th>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Details / Diagnostics</th>
+              </tr>
+            </thead>
+            <tbody id="logs-table-body">
+              <tr>
+                <td colspan="4" class="table-empty">Loading audit logs...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Cloud Hosting Setup -->
+    <div class="tab-content" id="tab-deploy" role="tabpanel">
+      <div class="glass-card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">How to Host This Tool on Render (100% Free)</h2>
+            <span class="card-subtitle">Connect your existing GitHub repository and deploy your live web dashboard in under 3 minutes.</span>
+          </div>
+          <span class="badge badge-emerald">Recommended: Free Forever</span>
+        </div>
+
+        <div class="deploy-steps-container">
+          <div class="deploy-step">
+            <div class="step-badge">1</div>
+            <div class="step-content">
+              <h3>Push Your Latest Code to GitHub</h3>
+              <p>Your workspace is already linked to your GitHub repository: <code>https://github.com/OmkarMundhe04/skillnexis_internship</code>.</p>
+              <pre class="code-snippet"><code>git add .
+git commit -m "Add web dashboard and cloud hosting configuration"
+git push origin main</code></pre>
+            </div>
+          </div>
+
+          <div class="deploy-step">
+            <div class="step-badge">2</div>
+            <div class="step-content">
+              <h3>Create a Free Web Service on Render</h3>
+              <ol class="step-list">
+                <li>Go to <a href="https://render.com" target="_blank" rel="noopener noreferrer">Render.com</a> and sign up or log in (1-click with GitHub).</li>
+                <li>Click <strong>New +</strong> and select <strong>Web Service</strong>.</li>
+                <li>Connect your GitHub repository <strong><code>skillnexis_internship</code></strong>.</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="deploy-step">
+            <div class="step-badge">3</div>
+            <div class="step-content">
+              <h3>Configure the Service Settings</h3>
+              <div class="deploy-config-table">
+                <div class="config-row">
+                  <span class="config-key">Root Directory</span>
+                  <span class="config-val"><code>week4/Assignment-project/student-email-automation</code></span>
+                </div>
+                <div class="config-row">
+                  <span class="config-key">Runtime</span>
+                  <span class="config-val"><strong>Python 3</strong></span>
+                </div>
+                <div class="config-row">
+                  <span class="config-key">Build Command</span>
+                  <span class="config-val"><code>pip install -r requirements.txt</code></span>
+                </div>
+                <div class="config-row">
+                  <span class="config-key">Start Command</span>
+                  <span class="config-val"><code>uvicorn app:app --host 0.0.0.0 --port $PORT</code></span>
+                </div>
+                <div class="config-row">
+                  <span class="config-key">Instance Type</span>
+                  <span class="config-val"><span class="badge badge-emerald">Free</span> ($0/month)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="deploy-step">
+            <div class="step-badge">4</div>
+            <div class="step-content">
+              <h3>Add Your SMTP Environment Variables Securely</h3>
+              <p>Under the <strong>Environment Variables</strong> section on Render, add:</p>
+              <div class="deploy-env-grid">
+                <div class="env-item"><code>SENDER_EMAIL</code> = <code>your-email@gmail.com</code></div>
+                <div class="env-item"><code>SENDER_PASSWORD</code> = <code>your-16-char-app-password</code></div>
+                <div class="env-item"><code>SMTP_SERVER</code> = <code>smtp.gmail.com</code></div>
+                <div class="env-item"><code>SMTP_PORT</code> = <code>587</code></div>
+                <div class="env-item"><code>DRY_RUN</code> = <code>true</code> (or <code>false</code> for live)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="deploy-step">
+            <div class="step-badge">5</div>
+            <div class="step-content">
+              <h3>Click "Create Web Service"</h3>
+              <p>Render will automatically build your app and give you a public URL like <code>https://student-email-automation.onrender.com</code>. You can now access your dashboard and send emails from any browser or phone!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Live Send Confirmation Modal (Native <dialog>) -->
+  <dialog id="modal-confirm-live" class="app-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-icon-danger">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+        <h3 class="modal-title">Confirm Live Email Dispatch</h3>
+      </div>
+      <div class="modal-body">
+        <p>You have selected <strong>LIVE SEND</strong> mode. This will connect to your SMTP server and send real emails to all valid students in your list.</p>
+        <div class="modal-stats-box">
+          <div>Recipients to be contacted: <strong id="modal-recipient-count">0</strong></div>
+          <div>Sender: <strong id="modal-sender-email" class="truncate-email">...</strong></div>
+        </div>
+        <p class="modal-subtext">If you only want to test without sending actual emails, choose <strong>Dry Run</strong> instead.</p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="btn-cancel-live-send">Cancel</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-live-send">Yes, Send Real Emails</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

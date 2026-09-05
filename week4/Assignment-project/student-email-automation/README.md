@@ -73,16 +73,27 @@ student-email-automation/
 ├── data/
 │   └── students.csv                # Recipient dataset (name, email)
 ├── templates/
-│   └── placement_email.html        # Responsive HTML email template
+│   ├── placement_email.html        # Responsive HTML email template
+│   └── dashboard.html              # Modern Web Dashboard interface
+├── static/
+│   ├── style.css                   # Custom Vanilla CSS design system
+│   └── app.js                      # Clientside SSE engine & UI controller
 ├── logs/
 │   └── email_log.csv               # Audit trail of all dispatches and simulations
 ├── tests/
-│   └── test_email_automation.py    # Unit & integration test suite (10 test cases)
+│   ├── test_email_automation.py    # Core email engine tests (10 test cases)
+│   └── test_app.py                 # FastAPI web dashboard tests (8 test cases)
+├── app.py                          # FastAPI web application & SSE progress backend
 ├── email_automation.py             # Core automation script & CLI entrypoint
-├── start.bat                       # Interactive Windows launcher (Double-click to run)
+├── start_dashboard.bat             # 1-Click Windows launcher for Web Dashboard
+├── start.bat                       # Interactive Windows launcher for CLI
+├── DEPLOYMENT.md                   # Complete 100% Free Cloud Hosting Guide (Render)
+├── render.yaml                     # Render Blueprint for automatic Git deployment
+├── Dockerfile                      # Production container image
+├── Procfile                        # PaaS web process configuration
 ├── .env.example                    # Template for environment configuration
 ├── .gitignore                      # Excludes credentials, caches, logs, and venvs
-├── requirements.txt                # Project dependencies (python-dotenv)
+├── requirements.txt                # Project dependencies (FastAPI, Uvicorn, python-dotenv)
 └── README.md                       # Comprehensive documentation
 ```
 
@@ -189,6 +200,43 @@ If you are using a Gmail or Google Workspace account, Google does not allow send
 4. Enter an app name (e.g., `Student Email Automation`) and click **Create**.
 5. Google will display a 16-character passcode (e.g. `abcd efgh ijkl mnop`).
 6. Copy this code into your `.env` file for `SENDER_PASSWORD` (spaces are ignored or can be removed).
+
+---
+
+## Interactive Web Dashboard
+
+In addition to the command-line tool, a modern web dashboard is included with real-time SSE progress streaming, in-browser CSV uploading, HTML template previewing, and live audit log inspection.
+
+### Running Locally:
+- **Windows (1-Click)**: Double-click **`start_dashboard.bat`**
+- **Terminal**:
+  ```bash
+  python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload
+  ```
+- Open [http://localhost:8000](http://localhost:8000) in any browser.
+
+---
+
+## Cloud Hosting & Deployment
+
+The tool is pre-configured for **100% free cloud hosting** on [Render](https://render.com) (or Docker platforms like Hugging Face Spaces and Koyeb):
+
+1. **Push your code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Add web dashboard and cloud hosting configuration"
+   git push origin main
+   ```
+2. **Deploy on Render**:
+   - Go to [render.com](https://render.com) and click **New +** -> **Web Service**.
+   - Select your repository `skillnexis_internship`.
+   - Set **Root Directory** to `week4/Assignment-project/student-email-automation`.
+   - Set **Start Command** to `uvicorn app:app --host 0.0.0.0 --port $PORT`.
+   - Choose the **Free** instance plan ($0/mo).
+   - In **Environment Variables**, set `SENDER_EMAIL` and `SENDER_PASSWORD`.
+   - Click **Deploy Web Service** — your app is live on HTTPS in 2 minutes!
+
+> For complete visual deployment instructions with alternative free hosts (Hugging Face Spaces, Koyeb), see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 
