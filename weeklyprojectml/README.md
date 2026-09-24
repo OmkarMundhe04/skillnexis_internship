@@ -342,4 +342,4 @@ If you or your evaluator still prefer the Streamlit interface:
 - **Email**: [omkarmundhe04@gmail.com](mailto:omkarmundhe04@gmail.com)
 - **GitHub**: [OmkarMundhe04](https://github.com/OmkarMundhe04)
 - **Internship**: SkillNexis Python & Applied Machine Learning Internship (Week 4 Capstone)
-- **License**: MIT Open Source License
+
