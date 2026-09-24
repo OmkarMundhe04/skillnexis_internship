@@ -15,9 +15,8 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field
 
 from src.predict import load_pipeline, predict_loan
@@ -27,6 +26,7 @@ STATIC_DIR = PROJECT_ROOT / "static"
 TEMPLATES_DIR = PROJECT_ROOT / "templates"
 FIGURES_DIR = PROJECT_ROOT / "outputs" / "figures"
 METRICS_PATH = PROJECT_ROOT / "outputs" / "metrics" / "model_metrics.json"
+INDEX_HTML = TEMPLATES_DIR / "index.html"
 
 STATIC_DIR.mkdir(parents=True, exist_ok=True)
 TEMPLATES_DIR.mkdir(parents=True, exist_ok=True)
@@ -52,8 +52,6 @@ app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 if FIGURES_DIR.exists():
     app.mount("/figures", StaticFiles(directory=str(FIGURES_DIR)), name="figures")
 
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-
 # Pre-load ML pipeline into memory at startup
 try:
     ml_pipeline = load_pipeline()
@@ -78,10 +76,15 @@ class LoanApplicantInput(BaseModel):
     Property_Area: str = Field(default="Semiurban")
 
 
-@app.get("/", response_class=HTMLResponse)
-async def serve_dashboard(request: Request):
+@app.get("/")
+async def serve_dashboard():
     """Serves the fast, responsive single-page web dashboard."""
-    return templates.TemplateResponse("index.html", {"request": request})
+    if INDEX_HTML.exists():
+        return FileResponse(str(INDEX_HTML), media_type="text/html")
+    alt_path = PROJECT_ROOT / "index.html"
+    if alt_path.exists():
+        return FileResponse(str(alt_path), media_type="text/html")
+    return HTMLResponse("<h1>Bank Loan Approval Prediction System</h1>", status_code=200)
 
 
 @app.get("/api/health")
