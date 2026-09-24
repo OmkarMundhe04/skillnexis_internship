@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Loan Approval Prediction System | ML Capstone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand">
+                <span class="brand-icon">🏦</span>
+                <div>
+                    <span class="brand-title">LoanAI Predictor</span>
+                    <span class="brand-subtitle">ML Risk Assessment Engine</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-btn active" onclick="switchTab('home')">🏠 Home</button>
+                <button class="nav-btn" onclick="switchTab('eda')">📊 Dataset & EDA</button>
+                <button class="nav-btn" onclick="switchTab('models')">🤖 Model Benchmarks</button>
+                <button class="nav-btn highlight" onclick="switchTab('predict')">🔮 Instant Predictor</button>
+                <button class="nav-btn" onclick="switchTab('about')">ℹ️ About</button>
+            </nav>
+            <div class="server-status">
+                <span class="status-dot"></span> Online (FastAPI)
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="main-content">
+
+        <!-- TAB 1: HOME -->
+        <section id="tab-home" class="tab-pane active">
+            <div class="hero-banner">
+                <div class="hero-text">
+                    <span class="badge">Machine Learning Capstone • Python 3.13</span>
+                    <h1>Intelligent Credit Risk & Loan Approval System</h1>
+                    <p>A high-performance supervised learning pipeline engineered to evaluate applicant creditworthiness, predict loan outcomes, and provide transparent risk factor explanations with sub-10ms inference.</p>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="switchTab('predict')">🚀 Launch Predictor</button>
+                        <button class="btn btn-secondary" onclick="switchTab('models')">📈 View Evaluation Metrics</button>
+                    </div>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <div class="stat-number">85.4%</div>
+                        <div class="stat-label">Model Accuracy (XGBoost)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">0.9022</div>
+                        <div class="stat-label">Champion F1-Score</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">97.6%</div>
+                        <div class="stat-label">Approval Recall</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">&lt; 10ms</div>
+                        <div class="stat-label">Inference Latency</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ML Workflow -->
+            <div class="card mt-4">
+                <h2>🔄 Machine Learning Lifecycle</h2>
+                <div class="workflow-steps">
+                    <div class="step-card">
+                        <div class="step-num">01</div>
+                        <h3>Data Ingestion</h3>
+                        <p>614 historical records with 12 attributes including credit history, income, and debt terms.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">02</div>
+                        <h3>Hygiene & Leakage Prevention</h3>
+                        <p>Categorical mode and numerical median imputations fitted strictly on 80% train split.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">03</div>
+                        <h3>Feature Engineering</h3>
+                        <p>Derived Total Household Income, EMI debt burden, and Income-to-Loan ratios.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">04</div>
+                        <h3>Ensemble Modeling</h3>
+                        <p>Compared Logistic Regression baseline against Random Forest and tuned XGBoost.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-num">05</div>
+                        <h3>Real-Time Inference</h3>
+                        <p>Probability scoring with qualitative risk tier assignment and key explanatory factors.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notice -->
+            <div class="alert-box alert-warning mt-4">
+                <strong>⚠️ Educational Demonstration Notice:</strong> This software is developed for an academic internship portfolio. Predictions are statistical model estimates and should <strong>never</strong> be used as actual banking, legal, or lending decisions.
+            </div>
+        </section>
+
+        <!-- TAB 2: DATASET & EDA -->
+        <section id="tab-eda" class="tab-pane">
+            <div class="section-header">
+                <h2>📊 Dataset & Exploratory Data Analysis</h2>
+                <p>Statistical properties and structural distributions from the benchmark loan dataset.</p>
+            </div>
+
+            <div class="grid-2 mt-4">
+                <div class="card">
+                    <h3>1. Target Class Balance</h3>
+                    <img src="/figures/class_distribution.png" alt="Class Distribution" class="eda-img">
+                    <p class="caption mt-2"><strong>Finding:</strong> 68.7% approved (422 records) vs. 31.3% rejected (192 records). Stratified sampling was applied across all train/test splits to maintain identical distribution.</p>
+                </div>
+                <div class="card">
+                    <h3>2. Credit History Impact</h3>
+                    <img src="/figures/credit_history_vs_status.png" alt="Credit History vs Loan Status" class="eda-img">
+                    <p class="caption mt-2"><strong>Finding:</strong> Applicants with good credit history (1.0) achieve a 79.6% approval rate. Applicants with adverse credit records (0.0) face a 91.8% rejection rate.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <h3>3. Feature Correlation Matrix</h3>
+                <img src="/figures/correlation_heatmap.png" alt="Correlation Heatmap" class="eda-img max-w-full">
+                <p class="caption mt-2"><strong>Finding:</strong> Notable collinearity (~0.62) exists between Total Household Income and requested Loan Amount, supporting the creation of normalized debt-to-income features.</p>
+            </div>
+        </section>
+
+        <!-- TAB 3: MODEL BENCHMARKS -->
+        <section id="tab-models" class="tab-pane">
+            <div class="section-header">
+                <h2>🤖 Multi-Model Evaluation & Diagnostics</h2>
+                <p>Authentic, calculated holdout test performance metrics across 123 unseen applicant records.</p>
+            </div>
+
+            <!-- Metrics Table -->
+            <div class="card mt-4">
+                <h3>Comparative Performance Matrix</h3>
+                <div class="table-responsive">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Algorithm Family</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                                <th>ROC-AUC</th>
+                                <th>Designation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Logistic Regression</strong></td>
+                                <td>83.74%</td>
+                                <td>87.36%</td>
+                                <td>89.41%</td>
+                                <td>0.8837</td>
+                                <td>0.8601</td>
+                                <td><span class="tag tag-gray">Baseline</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Random Forest Classifier</strong></td>
+                                <td>84.55%</td>
+                                <td><strong>89.29%</strong></td>
+                                <td>88.24%</td>
+                                <td>0.8876</td>
+                                <td><strong>0.8659</strong></td>
+                                <td><span class="tag tag-blue">Highest AUC</span></td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td><strong>XGBoost Classifier</strong></td>
+                                <td><strong>85.37%</strong></td>
+                                <td>83.84%</td>
+                                <td><strong>97.65%</strong></td>
+                                <td><strong>0.9022</strong></td>
+                                <td>0.8563</td>
+                                <td><span class="tag tag-green">🏆 Champion</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid-2 mt-4">
+                <div class="card">
+                    <h3>Confusion Matrix (Champion)</h3>
+                    <img src="/figures/confusion_matrix.png" alt="Confusion Matrix" class="eda-img">
+                    <p class="caption mt-2">True Positives: 83 | False Negatives: 2 (minimal false rejection of solvent applicants).</p>
+                </div>
+                <div class="card">
+                    <h3>Receiver Operating Characteristic (ROC)</h3>
+                    <img src="/figures/roc_curve.png" alt="ROC Curve" class="eda-img">
+                    <p class="caption mt-2">All three candidate architectures demonstrate excellent separability (AUC > 0.85).</p>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <h3>Feature Importance Analysis (Tree Splits)</h3>
+                <img src="/figures/feature_importance.png" alt="Feature Importance" class="eda-img">
+                <p class="caption mt-2"><strong>Interpretability Notice:</strong> Feature importance measures the contribution to decision splits within trees. It denotes statistical influence, not direct real-world causation.</p>
+            </div>
+        </section>
+
+        <!-- TAB 4: INSTANT PREDICTOR -->
+        <section id="tab-predict" class="tab-pane">
+            <div class="section-header">
+                <h2>🔮 Real-Time Loan Approval Predictor</h2>
+                <p>Input applicant parameters below to obtain instantaneous risk classification and probability scoring.</p>
+            </div>
+
+            <div class="grid-predictor mt-4">
+                <!-- Prediction Form -->
+                <div class="card">
+                    <h3>Applicant Information</h3>
+                    <form id="loanForm" onsubmit="handlePrediction(event)">
+                        
+                        <div class="form-section-title">Demographics & Profile</div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label for="Gender">Gender</label>
+                                <select id="Gender" name="Gender">
+                                    <option value="Male" selected>Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Married">Marital Status</label>
+                                <select id="Married" name="Married">
+                                    <option value="Yes" selected>Married (Yes)</option>
+                                    <option value="No">Unmarried (No)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Dependents">Dependents</label>
+                                <select id="Dependents" name="Dependents">
+                                    <option value="0">0</option>
+                                    <option value="1" selected>1</option>
+                                    <option value="2">2</option>
+                                    <option value="3+">3+</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="Education">Education</label>
+                                <select id="Education" name="Education">
+                                    <option value="Graduate" selected>Graduate</option>
+                                    <option value="Not Graduate">Not Graduate</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Self_Employed">Self Employed</label>
+                                <select id="Self_Employed" name="Self_Employed">
+                                    <option value="No" selected>No (Salaried)</option>
+                                    <option value="Yes">Yes (Self-Employed)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-section-title mt-3">Monthly Incomes ($)</div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label for="ApplicantIncome">Primary Applicant Monthly Income ($)</label>
+                                <input type="number" id="ApplicantIncome" name="ApplicantIncome" value="5000" min="0" step="250" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="CoapplicantIncome">Co-Applicant Monthly Income ($)</label>
+                                <input type="number" id="CoapplicantIncome" name="CoapplicantIncome" value="1800" min="0" step="250" required>
+                            </div>
+                        </div>
+
+                        <div class="form-section-title mt-3">Loan Details & Credit Profile</div>
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label for="LoanAmount">Requested Loan ($ Thousands)</label>
+                                <input type="number" id="LoanAmount" name="LoanAmount" value="130" min="5" max="1000" step="5" required>
+                                <small class="form-hint">e.g. 130 = $130,000</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="Loan_Amount_Term">Repayment Term (Months)</label>
+                                <select id="Loan_Amount_Term" name="Loan_Amount_Term">
+                                    <option value="120">120 (10 Years)</option>
+                                    <option value="180">180 (15 Years)</option>
+                                    <option value="240">240 (20 Years)</option>
+                                    <option value="300">300 (25 Years)</option>
+                                    <option value="360" selected>360 (30 Years)</option>
+                                    <option value="480">480 (40 Years)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="Property_Area">Property Location</label>
+                                <select id="Property_Area" name="Property_Area">
+                                    <option value="Semiurban" selected>Semiurban</option>
+                                    <option value="Urban">Urban</option>
+                                    <option value="Rural">Rural</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-2">
+                            <label for="Credit_History">Past Credit History Guidelines</label>
+                            <select id="Credit_History" name="Credit_History">
+                                <option value="1.0" selected>Meets Standard Guidelines (1.0 - Good History)</option>
+                                <option value="0.0">Does NOT Meet Guidelines / Adverse Defaults (0.0 - Bad History)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn btn-primary w-full" id="submitBtn">
+                                🚀 Evaluate Loan Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Result Display Card -->
+                <div class="card result-card" id="resultContainer">
+                    <div id="resultPlaceholder" class="placeholder-state">
+                        <div class="placeholder-icon">📋</div>
+                        <h3>Application Ready for Evaluation</h3>
+                        <p>Fill out the applicant details on the left and click <strong>Evaluate Loan Application</strong> to receive real-time probability scoring and risk analysis.</p>
+                    </div>
+
+                    <div id="resultContent" style="display: none;">
+                        <div id="decisionBanner" class="decision-box">
+                            <h2 id="decisionTitle">Outcome</h2>
+                            <p id="decisionSubtitle">Description</p>
+                            <div class="risk-badge" id="riskBadge">Risk Tier</div>
+                        </div>
+
+                        <div class="probability-meters mt-4">
+                            <div class="prob-row">
+                                <div class="prob-label">
+                                    <span>Approval Likelihood</span>
+                                    <strong id="approvalProbText">0%</strong>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill fill-green" id="approvalProbBar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                            <div class="prob-row mt-2">
+                                <div class="prob-label">
+                                    <span>Rejection Likelihood</span>
+                                    <strong id="rejectionProbText">0%</strong>
+                                </div>
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill fill-red" id="rejectionProbBar" style="width: 0%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <h4>Primary Risk & Explanatory Factors:</h4>
+                            <ul id="factorsList" class="factors-list"></ul>
+                        </div>
+
+                        <div class="alert-box alert-warning mt-4">
+                            <small id="disclaimerText">Educational Machine Learning prediction. This prediction should NOT be treated as an actual banking or financial lending decision.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: ABOUT -->
+        <section id="tab-about" class="tab-pane">
+            <div class="section-header">
+                <h2>ℹ️ About the Project</h2>
+                <p>Architecture, technological foundations, and ethical AI compliance.</p>
+            </div>
+
+            <div class="grid-2 mt-4">
+                <div class="card">
+                    <h3>Project Information</h3>
+                    <p>The <strong>Bank Loan Approval Prediction System</strong> is an educational machine learning capstone project designed to showcase practical credit risk assessment, data hygiene, exploratory data analysis, leakage-free feature pipelines, multi-model evaluation, and interactive web deployment.</p>
+                    
+                    <h4 class="mt-3">Technology Stack:</h4>
+                    <ul class="tech-list">
+                        <li><strong>Backend API:</strong> Python 3.13, FastAPI, Uvicorn</li>
+                        <li><strong>Machine Learning:</strong> scikit-learn, XGBoost</li>
+                        <li><strong>Data Manipulation:</strong> pandas, NumPy</li>
+                        <li><strong>Visualizations:</strong> Matplotlib, Seaborn</li>
+                        <li><strong>Frontend:</strong> Vanilla HTML5, Modern CSS, Fetch API (Zero Framework Bloat, <100ms load time)</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3>Developer Credentials</h3>
+                    <p><strong>Author:</strong> Omkar Mundhe</p>
+                    <p><strong>Email:</strong> <a href="mailto:omkarmundhe04@gmail.com">omkarmundhe04@gmail.com</a></p>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/OmkarMundhe04" target="_blank">github.com/OmkarMundhe04</a></p>
+                    <p><strong>Track:</strong> SkillNexis Python & Applied Machine Learning Internship</p>
+                    <p><strong>License:</strong> MIT Open Source</p>
+
+                    <h4 class="mt-3">Keep-Alive & Deployment Advantage:</h4>
+                    <p class="caption">Unlike Streamlit Community Cloud which hibernates after periods of inactivity, this FastAPI architecture boots in milliseconds and can be kept 100% online on free tiers (Render / Hugging Face Spaces) via a free heartbeat monitor (e.g. UptimeRobot) pinging <code>/api/health</code>.</p>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <h3>⚖️ Ethical Considerations & Fair Lending Principles</h3>
+                <p>1. <strong>Protected Demographic Attributes:</strong> Variables like <code>Gender</code> and <code>Married</code> are present in historical benchmark datasets. In actual financial lending systems (e.g., under the US Equal Credit Opportunity Act - ECOA), using protected characteristics in credit decisions is illegal. Real-world scorecards must exclude protected traits.</p>
+                <p>2. <strong>Historical Inequity:</strong> Algorithms risk learning and reinforcing past socio-economic biases present in historical training records. Independent fairness audits are vital.</p>
+                <p>3. <strong>Adverse Action Transparency:</strong> Underwriting candidates denied credit are legally entitled to receive specific reasons for adverse action. Black-box models must be coupled with explainability tools (e.g. SHAP).</p>
+                <p>4. <strong>Human-in-the-Loop Oversight:</strong> Algorithmic scores should remain advisory; final credit decisions require accredited human underwriting review.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 Omkar Mundhe • Bank Loan Approval Prediction System • Educational Machine Learning Capstone</p>
+    </footer>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

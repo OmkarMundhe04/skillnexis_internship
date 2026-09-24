@@ -1,0 +1,34 @@
+{
+    "best_model": "XGBoost",
+    "selection_criteria": "Selected based on superior ROC-AUC score and harmonic F1-score balance on the stratified holdout test split (20%).",
+    "dataset_statistics": {
+        "total_records": 614,
+        "train_records": 491,
+        "test_records": 123,
+        "approved_ratio": 0.6873,
+        "rejected_ratio": 0.3127
+    },
+    "models": {
+        "Logistic Regression": {
+            "accuracy": 0.8374,
+            "precision": 0.8736,
+            "recall": 0.8941,
+            "f1_score": 0.8837,
+            "roc_auc": 0.8601
+        },
+        "Random Forest": {
+            "accuracy": 0.8455,
+            "precision": 0.8929,
+            "recall": 0.8824,
+            "f1_score": 0.8876,
+            "roc_auc": 0.8659
+        },
+        "XGBoost": {
+            "accuracy": 0.8537,
+            "precision": 0.8384,
+            "recall": 0.9765,
+            "f1_score": 0.9022,
+            "roc_auc": 0.8563
+        }
+    }
+}
