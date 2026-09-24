@@ -53,7 +53,7 @@ The model was trained on the standard benchmark Loan Prediction Dataset, consist
 | `Self_Employed` | String | Categorical | Employment status (`Yes`, `No`) |
 | `ApplicantIncome` | Integer | Numerical | Primary applicant gross monthly income |
 | `CoapplicantIncome`| Float | Numerical | Co-applicant monthly income |
-| `LoanAmount` | Float | Numerical | Requested loan amount in thousands ($K) |
+| `LoanAmount` | Float | Numerical | Requested loan amount in thousands of rupees (₹) |
 | `Loan_Amount_Term`| Float | Numerical | Term of loan amortization in months (12 to 480) |
 | `Credit_History` | Float | Numerical | Past credit repayment record (`1.0` = Good, `0.0` = Adverse) |
 | `Property_Area` | String | Categorical | Collateral location (`Urban`, `Semiurban`, `Rural`) |

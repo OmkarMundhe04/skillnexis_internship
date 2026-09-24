@@ -62,9 +62,9 @@ The system utilizes the standard Kaggle / Analytics Vidhya benchmark **Loan Pred
 | `Dependents` | Categorical | Number of financial dependents | `0`, `1`, `2`, `3+` |
 | `Education` | Categorical | Applicant educational attainment | `Graduate`, `Not Graduate` |
 | `Self_Employed` | Categorical | Self-employment status | `Yes`, `No` |
-| `ApplicantIncome` | Numeric | Monthly gross earnings of primary applicant | $150 – $81,000 |
-| `CoapplicantIncome`| Numeric | Monthly gross earnings of co-signer | $0 – $41,667 |
-| `LoanAmount` | Numeric | Requested principal loan in thousands ($K) | $9K – $700K |
+| `ApplicantIncome` | Numeric | Monthly gross earnings of primary applicant | ₹150 – ₹81,000 |
+| `CoapplicantIncome`| Numeric | Monthly gross earnings of co-signer | ₹0 – ₹41,667 |
+| `LoanAmount` | Numeric | Requested principal loan in thousands of rupees (₹K) | ₹9,000 – ₹7,00,000 (₹9K – ₹700K) |
 | `Loan_Amount_Term`| Numeric | Repayment amortization duration in months | 12 to 480 months (default: 360) |
 | `Credit_History` | Numeric | Meets standard credit repayment guidelines | `1.0` (Good), `0.0` (Adverse) |
 | `Property_Area` | Categorical | Collateral geographic area | `Urban`, `Semiurban`, `Rural` |

@@ -24,7 +24,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df_feat["TotalIncome"] = applicant_income + coapplicant_income
 
     # 2. Approximate Monthly EMI
-    # Note: LoanAmount in this standard dataset is expressed in thousands ($K)
+    # Note: LoanAmount in this dataset is expressed in thousands of rupees (₹ in Thousands)
     # Loan_Amount_Term is expressed in months (e.g. 360 = 30 years)
     loan_amt = df_feat.get("LoanAmount", np.nan)
     loan_term = df_feat.get("Loan_Amount_Term", np.nan)

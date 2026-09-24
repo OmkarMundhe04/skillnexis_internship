@@ -256,7 +256,7 @@ elif page == "📊 Dataset & EDA":
                 - **Self_Employed**: Self-employment status (`Yes` / `No`)
                 - **ApplicantIncome**: Monthly earnings of the primary applicant
                 - **CoapplicantIncome**: Monthly earnings of the co-applicant
-                - **LoanAmount**: Requested principal loan amount (in thousands of dollars)
+                - **LoanAmount**: Requested principal loan amount (in thousands of rupees / ₹)
                 - **Loan_Amount_Term**: Repayment duration in months (e.g. 360 months = 30 years)
                 - **Credit_History**: Past credit repayment record (`1.0` = Meets guidelines, `0.0` = Adverse/None)
                 - **Property_Area**: Geographic category of the collateral property (`Urban`, `Semiurban`, `Rural`)
@@ -434,33 +434,33 @@ elif page == "🔮 Loan Prediction":
             f1, f2 = st.columns(2)
             with f1:
                 applicant_income = st.number_input(
-                    "Primary Applicant Monthly Income ($)",
+                    "Primary Applicant Monthly Income (₹)",
                     min_value=0,
-                    max_value=150000,
-                    value=5000,
-                    step=250,
-                    help="Gross monthly earnings before deductions",
+                    max_value=1500000,
+                    value=50000,
+                    step=2500,
+                    help="Gross monthly earnings before deductions in Indian Rupees",
                 )
             with f2:
                 coapplicant_income = st.number_input(
-                    "Co-Applicant Monthly Income ($)",
+                    "Co-Applicant Monthly Income (₹)",
                     min_value=0,
-                    max_value=100000,
-                    value=1800,
-                    step=250,
-                    help="Monthly income of co-signer or guarantor (if applicable)",
+                    max_value=1000000,
+                    value=18000,
+                    step=2500,
+                    help="Monthly income of co-signer or guarantor in Indian Rupees",
                 )
 
             st.markdown("#### 3. Loan Requirements & Credit Profile")
             l1, l2, l3 = st.columns(3)
             with l1:
                 loan_amount = st.number_input(
-                    "Loan Amount Requested (in Thousands $)",
+                    "Loan Amount Requested (in Thousands ₹)",
                     min_value=5,
-                    max_value=1000,
+                    max_value=5000,
                     value=130,
                     step=5,
-                    help="e.g. 130 represents $130,000",
+                    help="e.g. 130 represents ₹1,30,000 (1.3 Lakhs)",
                 )
             with l2:
                 loan_term = st.selectbox(
@@ -567,8 +567,8 @@ elif page == "🔮 Loan Prediction":
                     dti_ratio = (emi_val / total_inc * 100) if total_inc > 0 else 0
 
                     with st.expander("📊 Calculated Financial Indicators"):
-                        st.write(f"- **Combined Monthly Household Income**: ${total_inc:,.2f}")
-                        st.write(f"- **Approximate Monthly EMI**: ${emi_val:,.2f}")
+                        st.write(f"- **Combined Monthly Household Income**: ₹{total_inc:,.2f}")
+                        st.write(f"- **Approximate Monthly EMI**: ₹{emi_val:,.2f}")
                         st.write(f"- **Estimated Monthly Debt Burden (EMI / Income)**: {dti_ratio:.1f}%")
 
                     st.markdown(
